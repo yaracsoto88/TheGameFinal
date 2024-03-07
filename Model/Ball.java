@@ -7,8 +7,7 @@ import java.awt.RenderingHints;
 import java.io.Serializable;
 import java.util.Random;
 
-
-public class Ball implements Runnable, VO,Serializable {
+public class Ball implements Runnable, VO, Serializable {
     private int vx, vy;
     private int posx, posy, radius;
     private boolean isRunning = true;
@@ -21,13 +20,13 @@ public class Ball implements Runnable, VO,Serializable {
         this.vy = vy;
         this.posx = posx;
         this.posy = posy;
-        this.radius = radius;   
+        this.radius = radius;
     }
 
     public Ball() {
     }
 
-    public Ball(Ball ball){
+    public Ball(Ball ball) {
         this.vx = ball.getVx();
         this.vy = ball.getVy();
         this.posx = ball.getPosx();
@@ -37,20 +36,24 @@ public class Ball implements Runnable, VO,Serializable {
     }
 
     public Ball(TGM model) {
-        this.model= model;
-        this.vx = ran.nextInt(1,3);
-        this.vy = ran.nextInt(1,3);
+        this.model = model;
+        this.vx = ran.nextInt(2, 4);
+        this.vy = ran.nextInt(2, 4);
         this.posx = ran.nextInt(500);
         this.posy = ran.nextInt(500);
-        this.radius = ran.nextInt(10,20);
+        this.radius = ran.nextInt(8, 22);
         this.color = new Color(ran.nextInt(255), ran.nextInt(255), ran.nextInt(255));
     }
 
-
+    public void kill() {
+        this.isRunning = false;
+        model.removeBall(this);
+    }
+    
     @Override
     public void run() {
         while (isRunning) {
-            if(!model.collideDetection(this)){
+            if (!model.collideDetection(this)) {
                 move();
             }
             try {
@@ -63,28 +66,18 @@ public class Ball implements Runnable, VO,Serializable {
         }
     }
 
-    public void kill() {
-        this.isRunning = false;
-        model.removeBall(this);
-    }
-
     @Override
     public void paint(Graphics g) {
-        // System.out.println("pintando en " + posx + " " + posy+ " " + radius);
         Graphics2D g2d = (Graphics2D) g;
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setColor(this.color);
-        g2d.fillOval(posx, posy, radius, radius); // Draw the ball
+        g2d.fillOval(posx, posy, radius, radius); 
     }
-
-   
- 
 
     @Override
     public void move() {
         posx += vx;
         posy += vy;
-        // System.out.println("posx: " + posx + " posy: " + posy);
     }
 
     public int getVx() {
@@ -147,7 +140,6 @@ public class Ball implements Runnable, VO,Serializable {
         this.color = color;
     }
 
- 
     public void setRan(Random ran) {
         this.ran = ran;
     }
@@ -159,5 +151,5 @@ public class Ball implements Runnable, VO,Serializable {
     public void setModel(TGM model) {
         this.model = model;
     }
-    
+
 }

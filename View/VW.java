@@ -11,19 +11,16 @@ import Model.Ball;
 
 public class VW extends Canvas implements Runnable {
 
-    private List<Ball> balls;
+    private List<Ball> ballList;
     private Image offscreenImage;
     TGV tgv;
-    private int fps;
-    private long lastTime;
 
-    public VW(List<Ball> balls, TGV tgv) {
+    public VW(List<Ball> ballList, TGV tgv) {
         this.tgv = tgv;
-        this.balls = balls;
+        this.ballList = ballList;
         Dimension d = new Dimension(500, 500);
         this.setPreferredSize(d);
-        lastTime = System.nanoTime();
-        
+
     }
 
     @Override
@@ -39,7 +36,7 @@ public class VW extends Canvas implements Runnable {
         Graphics offscreenGraphics = offscreenImage.getGraphics();
         clear((Graphics2D) offscreenGraphics);
         Graphics2D g2d = (Graphics2D) offscreenGraphics;
-        for (Ball bola : balls) {
+        for (Ball bola : ballList) {
             bola.paint(g2d);
         }
         g.drawImage(offscreenImage, 0, 0, this);
@@ -51,20 +48,10 @@ public class VW extends Canvas implements Runnable {
         g.fillRect(0, 0, getWidth(), getHeight());
     }
 
- 
-    private void calculateFPS() {
-        long currentTime = System.nanoTime();
-        long nanoElapsedTime = currentTime - lastTime;
-        long elapsedTime = nanoElapsedTime / 1000000;
-        fps = (int) (1000 / elapsedTime);
-        lastTime = currentTime;
-        tgv.fps.setText("FPS: " + fps);
-    }
     @Override
     public void run() {
         while (true) {
             repaint();
-            calculateFPS();
             try {
                 Thread.sleep(10);
             } catch (InterruptedException e) {

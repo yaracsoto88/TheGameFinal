@@ -2,7 +2,7 @@ package Interlocutor;
 
 import Data.PeerLocation;
 
-public class Peer extends Interlocutor{
+public class Peer extends Interlocutor {
     private PeerLocation location;
 
     public Peer(String ip, int port, PeerLocation location) {

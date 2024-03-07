@@ -4,10 +4,10 @@ import Data.PeerLocation;
 import Model.Ball;
 
 public class TGR {
-    TGPCT controler;
+    TGPCT controller;
 
-    public TGR(TGPCT controler) {
-        this.controler = controler;
+    public TGR(TGPCT controller) {
+        this.controller = controller;
     }
 
     public void collide(Object o1, Object o2) {
@@ -21,19 +21,19 @@ public class TGR {
 
     private void collide(Ball ball, String wall) {
         if (wall.equals("y+")) {
-           controler.enviarBola(ball,PeerLocation.NORTH);
+            controller.sendBall(ball, PeerLocation.NORTH);
             return;
         }
         if (wall.equals("y-")) {
-            controler.enviarBola(ball,PeerLocation.SOUTH);
+            controller.sendBall(ball, PeerLocation.SOUTH);
             return;
         }
         if (wall.equals("x+")) {
-            controler.enviarBola(ball,PeerLocation.EAST);
+            controller.sendBall(ball, PeerLocation.EAST);
             return;
         }
         if (wall.equals("x-")) {
-            controler.enviarBola(ball,PeerLocation.WEST);
+            controller.sendBall(ball, PeerLocation.WEST);
             return;
         }
 

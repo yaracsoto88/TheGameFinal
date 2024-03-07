@@ -7,19 +7,29 @@ import View.TGV;
 public class TGCT {
     TGV view;
     TGM model;
-    TGPCT controler;
-    public TGCT(TGPCT controler) {
-        this.controler = controler;
+    TGPCT controller;
+
+    public TGCT(TGPCT controller) {
+        this.controller = controller;
         this.model = new TGM(this);
         this.view = new TGV(this);
     }
 
+    public void addBall(Ball ball) {
+        this.model.addBall(ball);
+    }
+
+    public void collide(Object o1, Object o2) {
+        controller.collide(o1, o2);
+    }
+
     public void play() {
-        // cuando llamamos a addBall se crea una nueva bola y luego se incia un nuevo
-        // hilo para ejecutar esa misma bola
         this.model.addBall();
     }
 
+    public void removeBall(Ball ball) {
+        this.model.removeBall(ball);
+    }
 
     public TGV getView() {
         return this.view;
@@ -37,26 +47,12 @@ public class TGCT {
         this.model = model;
     }
 
-    public void collide(Object o1 , Object o2) {
-        controler.collide(o1, o2);
+    public TGPCT getController() {
+        return this.controller;
     }
 
-    public void addBall(Ball ball) {
-        this.model.addBall(ball);
+    public void setController(TGPCT controler) {
+        this.controller = controler;
     }
-
-    public void removeBall(Ball ball) {
-        this.model.removeBall(ball);
-    }
-
-
-    public TGPCT getControler() {
-        return this.controler;
-    }
-
-    public void setControler(TGPCT controler) {
-        this.controler = controler;
-    }
-
 
 }

@@ -5,21 +5,17 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-
 import Interlocutor.Peer;
 import Model.*;
 
-/*
-Clase de conexión, se encarga de la comunicación entre el cliente y el servidor.
-*/
 public class CH implements Runnable {
     private Socket socket;
-    private TCH hcc;
+    private TCH tch;
     private ObjectInputStream in;
     private ObjectOutputStream out;
     private CCT controller;
     private long timeReceivedMessage;
-    private volatile boolean runState = true;
+    private volatile boolean state = true;
     private String ip;
     private int port;
     private Peer peer;
@@ -32,7 +28,6 @@ public class CH implements Runnable {
     }
 
     public void initChanel(Socket socket) throws Exception {
-
         this.socket = socket;
         OutputStream os = socket.getOutputStream();
         this.out = new ObjectOutputStream(os);
@@ -41,67 +36,52 @@ public class CH implements Runnable {
 
         TCH healthCareConnection = new TCH(this, 10000);
         new Thread(healthCareConnection).start();
-        this.hcc = healthCareConnection;
+        this.tch = healthCareConnection;
         this.connected = true;
     }
 
-    public void sendBall(Ball ball) {
+    public void killSocket() {
         try {
-            Balldata ballData = new Balldata(ball);
-            out.writeObject(ballData);
-            out.flush();
-        } catch (Exception e) {
-            System.out.println(
-                    "hay un error :(" + "\n" + "Codigo de error: " + e);
-        }
-    }
-
-    public Peer getPeer() {
-        return this.peer;
-    }
-
-    public void recieveBall() {
-
-        try {
-            Object object = in.readObject();
-            System.out.println("Recibido ping");
-            if (object instanceof String && object.equals("ping")) {
-                System.out.println("Recibido ping");
-                return;
-            }
-            // System.out.println("Recibido bolas");
-            Balldata m = (Balldata) object;
-            controller.recibirBall(m.transformData());
-            long time = (System.currentTimeMillis());
-            setTimeReceivedMessage(time);
+            this.connected = false;
 
         } catch (Exception e) {
-            System.err.println("Error en la conexion");
-            killSocket();
+            System.out.println("Error disconnecting: " + e);
         }
-    }
-
-    public void setTimeReceivedMessage(long timeReceivedMessage) {
-        this.timeReceivedMessage = timeReceivedMessage;
-    }
-
-    public void setHCC(TCH hch) {
-        this.hcc = hch;
     }
 
     public boolean ping() {
         try {
-            // System.out.println("entra en ping");
             out.writeObject(new String("ping"));
             return true;
         } catch (Exception e) {
-            System.out.println("Error en el envío del heartbeat: " + e);
+            e.printStackTrace();
             return false;
         }
     }
 
+    public void recieveBall() {
+        try {
+            Object object = in.readObject();
+
+            if (object instanceof String && object.equals("ping")) {
+                System.out.println("Ping received");
+
+                return;
+            }
+
+            Balldata m = (Balldata) object;
+            controller.reciveBall(m.transformBall());
+            long time = (System.currentTimeMillis());
+            setTimeReceivedMessage(time);
+
+        } catch (Exception e) {
+            System.err.println("Error in recieveBall: " + e);
+            killSocket();
+        }
+    }
+
     public void run() {
-        while (runState) {
+        while (state) {
             if (!connected) {
                 try {
                     Thread.sleep(1000);
@@ -112,39 +92,56 @@ public class CH implements Runnable {
             }
             try {
                 Thread.sleep(1000);
-                // Verificar si la conexión actual está cerrada
+
                 if (socket == null || socket.isClosed() || !socket.isConnected()) {
-                    System.out.println("Conexión perdida, intentando reconectar...");
+                    System.out.println("connection lost, trying to reconnect...");
                     this.connected = false;
                     Thread.sleep(1000);
 
                 }
-                // Leer mensajes entrantes
-                System.out.println(this.connected + " " + "conectado");
+                System.out.println(this.connected + "connected");
                 if (socket != null && socket.isConnected()) {
                     recieveBall();
                 }
 
-                // Esperar un poco antes de verificar la conexión de nuevo
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
-                System.out.println("Error en la reconexión: " + e);
+                e.printStackTrace();
             }
         }
+    }
 
+    public void sendBall(Ball ball) {
+        try {
+            Balldata ballData = new Balldata(ball);
+            out.writeObject(ballData);
+            out.flush();
+        } catch (Exception e) {
+            System.out.println("Error" + e);
+        }
+    }
+
+    public void setHCC(TCH hch) {
+        this.tch = hch;
+    }
+
+    public void setTimeReceivedMessage(long timeReceivedMessage) {
+        this.timeReceivedMessage = timeReceivedMessage;
+    }
+
+    public Peer getPeer() {
+        return this.peer;
+    }
+
+    @Override
+    public String toString() {
+        return "CH [socket=" + socket + ", tch=" + tch + ", in=" + in + ", out=" + out + ", controller=" + controller
+                + ", timeReceivedMessage=" + timeReceivedMessage + ", state=" + state + ", ip=" + ip + ", port=" + port
+                + ", peer=" + peer + ", connected=" + connected + "]";
     }
 
     public long getTimeReceivedMessage() {
         return timeReceivedMessage;
-    }
-
-    public void killSocket() {
-        try {
-            this.connected = false;
-
-        } catch (Exception e) {
-            System.out.println("Error en la desconexión: " + e);
-        }
     }
 
     public Socket getSocket() {
@@ -163,17 +160,12 @@ public class CH implements Runnable {
         this.in = in;
     }
 
-    @Override
-    public String toString() {
-        return "esto existe";
+    public TCH getTch() {
+        return this.tch;
     }
 
-    public TCH getHcc() {
-        return this.hcc;
-    }
-
-    public void setHcc(TCH hcc) {
-        this.hcc = hcc;
+    public void setTch(TCH tch) {
+        this.tch = tch;
     }
 
     public ObjectInputStream getIn() {

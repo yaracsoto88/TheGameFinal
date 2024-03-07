@@ -3,8 +3,6 @@ package Model;
 import java.awt.Color;
 import java.io.Serializable;
 
-
-
 public class Balldata implements Serializable{
     private int vx, vy;
     private int posx, posy, radius;
@@ -19,7 +17,7 @@ public class Balldata implements Serializable{
         this.color = ball.getColor();
     }
 
-    public Ball transformData(){
+    public Ball transformBall(){
         Ball ball = new Ball();
         ball.setVx(this.vx);
         ball.setVy(this.vy);

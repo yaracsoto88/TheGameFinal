@@ -1,21 +1,20 @@
 package Server;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-/* Conector para actuar como servidor*/
-
-public class SC implements Runnable{
-    private int PORT;
+public class SC implements Runnable {
+    private int port;
     private ServerSocket serverSocket;
     private Socket clientSocket;
     private CCT controller;
 
-    public SC(CCT controller,int port) {
+    public SC(CCT controller, int port) {
         this.controller = controller;
-        this.PORT = port;
+        this.port = port;
         try {
-            serverSocket = new ServerSocket(PORT);
+            serverSocket = new ServerSocket(port);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -38,14 +37,15 @@ public class SC implements Runnable{
         }
     }
 
-    public void killSocket(){
-        try{
+    public void killSocket() {
+        try {
             serverSocket.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
-    public boolean isSocketClosed(){
+
+    public boolean isSocketClosed() {
         return serverSocket.isClosed();
     }
 }
