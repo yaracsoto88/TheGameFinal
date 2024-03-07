@@ -1,0 +1,5 @@
+package Data;
+
+public enum PeerLocation {
+    NORTH,NORTHEAST,NORTHWEST,SOUTH,SOUTHEAST,SOUTHWEST,EAST,WEST,FARAWAY;
+}
